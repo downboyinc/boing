@@ -236,6 +236,17 @@ window.addEventListener('touchcancel', () => {
   handleEnd()
 })
 
+// Neutralize spring when tab loses focus (but let sounds finish playing)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    // Reset spring to rest position and zero velocity
+    knobPos.x = basePos.x + restLength
+    knobPos.y = basePos.y
+    velocity = { x: 0, y: 0 }
+    isDragging = false
+  }
+})
+
 // --- Physics Engine ---
 function updatePhysics(deltaTime: number) {
   const timeScale = deltaTime / targetFrameTime
