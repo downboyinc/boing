@@ -115,7 +115,6 @@ canvas:active {
 }
 
 #footerLinks {
-  margin-top: 8px;
   font-size: 11px;
   pointer-events: auto;
 }
@@ -137,6 +136,6 @@ canvas:active {
 #footerLinks input[type="checkbox"] {
   cursor: pointer;
   position: relative;
-  top: 4px;
-  margin-right: -2px;
+  top: 3px;
+  margin-right: 0;
 }
