@@ -68,7 +68,7 @@ if (mobileStartBtn && mobileOverlay) {
 }
 
 // Spring physics
-const springStiffness = 0.85
+const springStiffness = 0.95
 const friction = 0.88
 
 // Visual "Bendiness" - how far out the spring stays straight before curving
