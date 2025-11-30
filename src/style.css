@@ -135,6 +135,27 @@ canvas {
   margin-right: 0;
 }
 
+#instructions,
+#app #boingCount {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+  z-index: 10;
+}
+
+#instructions {
+  top: 10px;
+  font-size: 11px;
+  color: #999;
+}
+
+#app #boingCount {
+  bottom: 10px;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #121212;

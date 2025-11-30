@@ -6,14 +6,19 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev-rcade": "concurrently \"vite --config vite.config.rcade.ts --port 5174 --strictPort\" \"rcade dev http://localhost:5174\"",
+    "build-rcade": "vite build --config vite.config.rcade.ts"
   },
   "devDependencies": {
     "@types/howler": "^2.2.12",
+    "concurrently": "^9.0.0",
+    "rcade": "^0.0.19",
     "typescript": "~5.9.3",
     "vite": "^7.2.4"
   },
   "dependencies": {
+    "@rcade/plugin-input-classic": "^0.2.1",
     "howler": "^2.2.4",
     "is-mobile": "^5.0.0"
   }

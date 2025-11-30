@@ -1,0 +1,16 @@
+{
+  "$schema": "https://rcade.recurse.com/manifest.schema.json",
+  "name": "boing",
+  "display_name": "boing",
+  "description": "boing",
+  "visibility": "public",
+  "authors": {
+    "display_name": "greg i guess"
+  },
+  "dependencies": [
+    {
+      "name": "@rcade/input-classic",
+      "version": "1.0.0"
+    }
+  ]
+}
