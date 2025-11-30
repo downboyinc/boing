@@ -424,6 +424,17 @@ document.addEventListener('visibilitychange', () => {
 
 // --- Physics Engine ---
 function updatePhysics(deltaTime: number) {
+  // Subdivide large timesteps to prevent instability
+  const maxStep = 16 // Max 16ms per physics step
+  const steps = Math.ceil(deltaTime / maxStep)
+  const stepTime = deltaTime / steps
+
+  for (let i = 0; i < steps; i++) {
+    updatePhysicsStep(stepTime)
+  }
+}
+
+function updatePhysicsStep(deltaTime: number) {
   let timeScale = deltaTime / targetFrameTime
   if (slomoEnabled) {
     timeScale = timeScale / slomoFactor
@@ -520,7 +531,15 @@ function updatePhysics(deltaTime: number) {
       currentAngle,
       lengthVelocity,
       angularVelocity,
-      knobPos: { ...knobPos }
+      knobPos: { ...knobPos },
+      deltaTime,
+      timeScale,
+      reason: !Number.isFinite(currentLength) ? 'currentLength not finite' :
+              !Number.isFinite(currentAngle) ? 'currentAngle not finite' :
+              !Number.isFinite(lengthVelocity) ? 'lengthVelocity not finite' :
+              !Number.isFinite(angularVelocity) ? 'angularVelocity not finite' :
+              Math.abs(lengthVelocity) > 10000 ? 'lengthVelocity too high' :
+              'angularVelocity too high'
     })
     knobPos.x = basePos.x + restLength
     knobPos.y = basePos.y
