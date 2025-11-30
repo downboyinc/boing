@@ -2,6 +2,12 @@ import { Howl } from 'howler'
 import isMobile from 'is-mobile'
 import './style.css'
 
+const API_URL = import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? 'https://respected-accordion-31461.ondis.co' : '')
+
+// Global boing count from server
+let globalBoingCount = 0
+
 // Detect mobile (for audio unlock overlay)
 const isMobileDevice = isMobile()
 
@@ -18,12 +24,14 @@ app.innerHTML = `
   </div>
   <div class="ui-layer">
     <div id="boingCount">you've boinged 0 times</div>
+    <div id="globalBoingCount">the world has boinged 0 times</div>
   </div>
 `
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement
 const ctx = canvas.getContext('2d')!
 const boingCountEl = document.getElementById('boingCount')!
+const globalBoingCountEl = document.getElementById('globalBoingCount')!
 const mobileOverlay = document.getElementById('mobileOverlay')
 const mobileStartBtn = document.getElementById('mobileStartBtn')
 
@@ -117,8 +125,40 @@ function fadeOutActiveSounds() {
 }
 
 function updateBoingCountDisplay() {
-  boingCountEl.innerText = `you've boinged ${boingCount} time${boingCount === 1 ? '' : 's'}`
+  boingCountEl.innerText = `you've boinged ${boingCount.toLocaleString()} time${boingCount === 1 ? '' : 's'}`
+  globalBoingCountEl.innerText = `the world has boinged ${globalBoingCount.toLocaleString()} time${globalBoingCount === 1 ? '' : 's'}`
 }
+
+async function reportBoingToServer() {
+  if (!API_URL) return
+  try {
+    const res = await fetch(`${API_URL}/boing`, { method: 'POST' })
+    if (res.ok) {
+      const data = await res.json()
+      globalBoingCount = data.count
+      updateBoingCountDisplay()
+    }
+  } catch (e) {
+    // Silently fail - don't break the game
+  }
+}
+
+async function fetchGlobalCount() {
+  if (!API_URL) return
+  try {
+    const res = await fetch(`${API_URL}/count`)
+    if (res.ok) {
+      const data = await res.json()
+      globalBoingCount = data.count
+      updateBoingCountDisplay()
+    }
+  } catch (e) {
+    // Silently fail
+  }
+}
+
+// Fetch initial count
+fetchGlobalCount()
 
 function triggerBoing(forceMagnitude: number) {
   if (!audioEnabled) return
@@ -153,6 +193,9 @@ function triggerBoing(forceMagnitude: number) {
   boingCount++
   localStorage.setItem('boingCount', boingCount.toString())
   updateBoingCountDisplay()
+
+  // Report to server
+  reportBoingToServer()
 }
 
 
