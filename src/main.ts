@@ -13,7 +13,9 @@ app.innerHTML = `
     <button id="mobileStartBtn">start boinging<br><span id="muteHint">(make sure to unmute your device)</span></button>
   </div>
   ` : ''}
-  <canvas id="canvas"></canvas>
+  <div id="canvasWrapper">
+    <canvas id="canvas"></canvas>
+  </div>
   <div class="ui-layer">
     <div id="boingCount">you've boinged 0 times</div>
   </div>
@@ -58,11 +60,11 @@ updateBoingCountDisplay()
 if (mobileStartBtn && mobileOverlay) {
   mobileStartBtn.addEventListener('touchend', (e) => {
     e.preventDefault()
-    initAudio()
+    audioEnabled = true
     mobileOverlay.style.display = 'none'
   })
   mobileStartBtn.addEventListener('click', () => {
-    initAudio()
+    audioEnabled = true
     mobileOverlay.style.display = 'none'
   })
 }
@@ -87,35 +89,39 @@ let audioEnabled = false
 let lastTime = 0
 const targetFrameTime = 1000 / 60 // Target 60fps
 
+
 // Initialize knob position after restLength is calculated
 knobPos.x = basePos.x + restLength
 
 // Audio - Howler setup for layered sounds
-let boingSound: Howl | null = null
+const boingSound = new Howl({
+  src: ['/boing2.wav'],
+  preload: true,
+  volume: 0.7,
+  html5: false, // Use Web Audio API for layering support
+  onloaderror: (_id, err) => console.error('Failed to load boing sound:', err),
+  onplayerror: (_id, err) => {
+    console.error('Failed to play boing sound:', err)
+  },
+})
+
+// Track active sound IDs for fading when caught
+let activeSoundIds: number[] = []
+
+function fadeOutActiveSounds() {
+  activeSoundIds.forEach(id => {
+    const currentVol = boingSound.volume(id) as number
+    boingSound.fade(currentVol, 0, 100, id)
+  })
+  activeSoundIds = []
+}
 
 function updateBoingCountDisplay() {
   boingCountEl.innerText = `you've boinged ${boingCount} time${boingCount === 1 ? '' : 's'}`
 }
 
-function initAudio() {
-  if (boingSound) return
-
-  boingSound = new Howl({
-    src: ['/boing2.wav'],
-    preload: true,
-    volume: 0.7,
-    html5: false, // Use Web Audio API for layering support
-    onloaderror: (_id, err) => console.error('Failed to load boing sound:', err),
-    onplayerror: (_id, err) => {
-      console.error('Failed to play boing sound:', err)
-    },
-  })
-
-  audioEnabled = true
-}
-
 function triggerBoing(forceMagnitude: number) {
-  if (!audioEnabled || !boingSound) return
+  if (!audioEnabled) return
 
   // Calculate playback rate based on force - more force = higher pitch
   // Pitched up 10% overall (multiply by 1.1)
@@ -133,9 +139,15 @@ function triggerBoing(forceMagnitude: number) {
   const id = boingSound.play()
   boingSound.rate(rate, id)
   boingSound.volume(volume, id)
+  activeSoundIds.push(id)
 
-  // Simple fade out over 2 seconds
+  // Simple fade out over 1.2 seconds
   boingSound.fade(volume, 0.1, 1200, id)
+
+  // Remove from active list when done
+  boingSound.once('end', () => {
+    activeSoundIds = activeSoundIds.filter(sid => sid !== id)
+  }, id)
 
   // Increment and save boing count
   boingCount++
@@ -154,19 +166,21 @@ function getMousePos(evt: MouseEvent | Touch): { x: number; y: number } {
 }
 
 function handleStart(pos: { x: number; y: number }) {
-  // Always init audio on first interaction (required for iOS)
+  // Unlock audio on first interaction (required for iOS)
   if (!audioEnabled) {
-    initAudio()
-    // Play a silent/tiny sound to unlock audio context on iOS
-    if (boingSound) {
-      const id = boingSound.play()
-      boingSound.volume(0, id)
-      boingSound.stop(id)
-    }
+    const id = boingSound.play()
+    boingSound.volume(0, id)
+    boingSound.stop(id)
+    audioEnabled = true
   }
 
   const dist = Math.hypot(pos.x - knobPos.x, pos.y - knobPos.y)
   if (dist < 50) {
+    // If catching the ball mid-air, fade out any playing sounds
+    const speed = Math.hypot(velocity.x, velocity.y)
+    if (speed > 1) {
+      fadeOutActiveSounds()
+    }
     isDragging = true
     mousePos = pos
   }
@@ -232,6 +246,7 @@ window.addEventListener('touchend', (e) => {
   handleEnd()
 }, { passive: false })
 
+
 window.addEventListener('touchcancel', () => {
   handleEnd()
 })
@@ -289,10 +304,6 @@ function updatePhysics(deltaTime: number) {
 
     velocity.x += ax
     velocity.y += ay
-
-    // Add tiny randomness for organic feel
-    velocity.x += (Math.random() - 0.5) * 0.1
-    velocity.y += (Math.random() - 0.5) * 0.1
 
     // Friction (adjusted for time scale)
     const frictionPerFrame = Math.pow(friction, timeScale)
