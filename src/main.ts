@@ -186,8 +186,9 @@ async function fetchGlobalCount() {
   }
 }
 
-// Fetch initial count
+// Fetch initial count and refresh every 30s
 fetchGlobalCount()
+setInterval(fetchGlobalCount, 30000)
 
 // Heatmap state
 let heatmapVisible = false
