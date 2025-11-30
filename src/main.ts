@@ -127,6 +127,13 @@ const angularFriction = 0.9
 let slomoEnabled = false
 const slomoFactor = 20
 
+// Dark mode state - follows browser setting
+const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)')
+let darkMode = darkModeQuery.matches
+darkModeQuery.addEventListener('change', (e) => {
+  darkMode = e.matches
+})
+
 // Debug mode - enable with enableDebug() in console
 let debugMode = false
 ;(window as any).enableDebug = () => {
@@ -166,7 +173,8 @@ function fadeOutActiveSounds() {
 
 function updateBoingCountDisplay() {
   boingCountEl.innerText = `you've boinged ${boingCount.toLocaleString()} time${boingCount === 1 ? '' : 's'}`
-  globalBoingCountEl.innerText = `the world has boinged ${globalBoingCount === null ? '?' : globalBoingCount.toLocaleString()} time${globalBoingCount === 1 ? '' : 's'}`
+  const heart = globalBoingCount !== null && globalBoingCount >= 1000000 ? ' ❤️' : ''
+  globalBoingCountEl.innerText = `the world has boinged ${globalBoingCount === null ? '?' : globalBoingCount.toLocaleString()} time${globalBoingCount === 1 ? '' : 's'}${heart}`
 }
 
 async function reportBoingToServer(angle: number, distRatio: number) {
@@ -245,6 +253,7 @@ heatmapToggle.addEventListener('change', async () => {
 slomoToggle.addEventListener('change', () => {
   slomoEnabled = slomoToggle.checked
 })
+
 
 function triggerBoing(forceMagnitude: number) {
   if (!audioEnabled) return
@@ -576,9 +585,9 @@ function drawSpring() {
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
   ctx.lineWidth = 3
-  ctx.strokeStyle = '#444'
+  ctx.strokeStyle = darkMode ? '#aaa' : '#444'
 
-  ctx.shadowColor = 'rgba(0,0,0,0.3)'
+  ctx.shadowColor = darkMode ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)'
   ctx.shadowBlur = 4
   ctx.shadowOffsetY = 4
 
@@ -620,15 +629,21 @@ function draw(currentTime: number) {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
+  // Canvas background for dark mode
+  if (darkMode) {
+    ctx.fillStyle = '#1a1a1a'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+  }
+
   // Draw heatmap if visible
   if (heatmapVisible && heatmapImage) {
     ctx.drawImage(heatmapImage, 0, 0)
   }
 
   // Wall
-  ctx.fillStyle = '#ccc'
+  ctx.fillStyle = darkMode ? '#333' : '#ccc'
   ctx.fillRect(0, 0, basePos.x, canvas.height)
-  ctx.strokeStyle = '#aaa'
+  ctx.strokeStyle = darkMode ? '#555' : '#aaa'
   ctx.beginPath()
   ctx.moveTo(basePos.x, 0)
   ctx.lineTo(basePos.x, canvas.height)
@@ -640,14 +655,14 @@ function draw(currentTime: number) {
     ctx.moveTo(knobPos.x, knobPos.y)
     ctx.lineTo(mousePos.x, mousePos.y)
     ctx.setLineDash([4, 4])
-    ctx.strokeStyle = 'rgba(0,0,0,0.3)'
+    ctx.strokeStyle = darkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'
     ctx.lineWidth = 2
     ctx.stroke()
     ctx.setLineDash([])
 
     ctx.beginPath()
     ctx.arc(mousePos.x, mousePos.y, 4, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(0,0,0,0.3)'
+    ctx.fillStyle = darkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'
     ctx.fill()
   }
 
