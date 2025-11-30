@@ -135,8 +135,9 @@ canvas {
   margin-right: 0;
 }
 
-#instructions,
-#app #boingCount {
+/* Rcade-only styles (when #boingCount is direct child of #app, not in .ui-layer) */
+#app > #instructions,
+#app > #boingCount {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -146,13 +147,13 @@ canvas {
   z-index: 10;
 }
 
-#instructions {
+#app > #instructions {
   top: 10px;
   font-size: 11px;
   color: #999;
 }
 
-#app #boingCount {
+#app > #boingCount {
   bottom: 10px;
 }
 
