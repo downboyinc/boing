@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite'
 import { resolve } from 'path'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [
@@ -21,5 +21,7 @@ export default defineConfig({
         main: resolve(__dirname, 'index-rcade.html'),
       },
     },
+    outDir: resolve(__dirname, 'dist-rcade'),
+    emptyOutDir: true,
   },
 })

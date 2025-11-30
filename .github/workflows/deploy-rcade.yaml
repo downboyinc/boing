@@ -27,3 +27,6 @@ jobs:
         run: npm run build-rcade
       - name: Deploy to RCade
         uses: fcjr/rcade/action-deploy@main
+        with:
+          artifactPath: ./dist-rcade
+          manifestPath: ./rcade.manifest.json
