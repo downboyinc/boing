@@ -57,7 +57,10 @@ window.addEventListener('resize', () => {
   // Reset spring to rest position on resize (no weird animation)
   knobPos.x = basePos.x + restLength
   knobPos.y = basePos.y
-  velocity = { x: 0, y: 0 }
+  currentLength = restLength
+  currentAngle = 0
+  lengthVelocity = 0
+  angularVelocity = 0
 })
 
 // Load boing count from localStorage
@@ -90,12 +93,18 @@ const pushLimit = 400
 
 // State
 let knobPos = { x: basePos.x + restLength, y: basePos.y }
-let velocity = { x: 0, y: 0 }
 let isDragging = false
 let mousePos = { x: 0, y: 0 }
 let audioEnabled = false
 let lastTime = 0
 const targetFrameTime = 1000 / 60 // Target 60fps
+
+// Polar physics state
+let currentLength = restLength
+let currentAngle = 0
+let lengthVelocity = 0
+let angularVelocity = 0
+const angularFriction = 0.9
 
 
 // Initialize knob position after restLength is calculated
@@ -220,7 +229,7 @@ function handleStart(pos: { x: number; y: number }) {
   const dist = Math.hypot(pos.x - knobPos.x, pos.y - knobPos.y)
   if (dist < 50) {
     // If catching the ball mid-air, fade out any playing sounds
-    const speed = Math.hypot(velocity.x, velocity.y)
+    const speed = Math.abs(lengthVelocity) + Math.abs(angularVelocity) * currentLength
     if (speed > 1) {
       fadeOutActiveSounds()
     }
@@ -300,7 +309,10 @@ document.addEventListener('visibilitychange', () => {
     // Reset spring to rest position and zero velocity
     knobPos.x = basePos.x + restLength
     knobPos.y = basePos.y
-    velocity = { x: 0, y: 0 }
+    currentLength = restLength
+    currentAngle = 0
+    lengthVelocity = 0
+    angularVelocity = 0
     isDragging = false
   }
 })
@@ -336,32 +348,47 @@ function updatePhysics(deltaTime: number) {
     knobPos.x = basePos.x + Math.cos(angle) * newDist
     knobPos.y = basePos.y + Math.sin(angle) * newDist
 
-    velocity = { x: 0, y: 0 }
+    // Update polar state to match current position
+    currentLength = newDist
+    currentAngle = angle
+    lengthVelocity = 0
+    angularVelocity = 0
   } else {
-    // Spring back with Hooke's Law (scaled by time)
-    const targetX = basePos.x + restLength
-    const targetY = basePos.y
+    // Polar spring physics - length springs back, angle decays separately
 
-    const ax = (targetX - knobPos.x) * springStiffness * timeScale
-    const ay = (targetY - knobPos.y) * springStiffness * timeScale
+    // Spring force on length (Hooke's law)
+    const lengthAccel = (restLength - currentLength) * springStiffness * timeScale
+    lengthVelocity += lengthAccel
+    lengthVelocity *= Math.pow(friction, timeScale)
+    currentLength += lengthVelocity * timeScale
 
-    velocity.x += ax
-    velocity.y += ay
+    // Dampen angle toward 0
+    const angleAccel = -currentAngle * 0.9 * timeScale
+    angularVelocity += angleAccel
+    angularVelocity *= Math.pow(angularFriction, timeScale)
+    currentAngle += angularVelocity * timeScale
 
-    // Friction (adjusted for time scale)
-    const frictionPerFrame = Math.pow(friction, timeScale)
-    velocity.x *= frictionPerFrame
-    velocity.y *= frictionPerFrame
+    // Clamp length
+    if (currentLength < 20) {
+      currentLength = 20
+      lengthVelocity *= -0.5
+    }
 
-    knobPos.x += velocity.x * timeScale
-    knobPos.y += velocity.y * timeScale
+    // Convert polar back to cartesian
+    knobPos.x = basePos.x + Math.cos(currentAngle) * currentLength
+    knobPos.y = basePos.y + Math.sin(currentAngle) * currentLength
 
     // Wall bounce
     if (knobPos.x < basePos.x + 20) {
       knobPos.x = basePos.x + 20
-      velocity.x *= -0.5
+      // Reflect angle off wall
+      if (Math.abs(currentAngle) > Math.PI / 2) {
+        currentAngle = Math.sign(currentAngle) * Math.PI - currentAngle
+        angularVelocity *= -0.5
+      }
+      currentLength = Math.hypot(knobPos.x - basePos.x, knobPos.y - basePos.y)
+      lengthVelocity *= -0.5
     }
-
   }
 }
 

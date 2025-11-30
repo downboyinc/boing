@@ -55,6 +55,7 @@ canvas:active {
   text-align: center;
   pointer-events: none;
   color: #555;
+  white-space: nowrap;
 }
 
 #initAudio {
