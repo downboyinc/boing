@@ -204,8 +204,8 @@ function triggerBoing(forceMagnitude: number) {
   boingSound.volume(volume, id)
   activeSoundIds.push(id)
 
-  // Simple fade out over 1.2 seconds
-  boingSound.fade(volume, 0.1, 1200, id)
+  // Simple fade out over 1.9 seconds
+  boingSound.fade(volume, 0.1, 1900, id)
 
   // Remove from active list when done
   boingSound.once('end', () => {
