@@ -38,7 +38,7 @@ app.innerHTML = `
   </div>
   <div class="ui-layer">
     <div id="boingCount">you've boinged 0 times</div>
-    <div id="globalBoingCount">the world has boinged 0 times</div>
+    <div id="globalBoingCount">the world has boinged ? times</div>
   </div>
 `
 
