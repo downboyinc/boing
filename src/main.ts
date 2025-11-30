@@ -259,8 +259,8 @@ function triggerBoing(forceMagnitude: number) {
   if (!audioEnabled) return
 
   if (debugMode) {
-    console.log('BOING', {
-      knobPos: { ...knobPos },
+    console.log('BOING ' + JSON.stringify({
+      knobPos,
       currentLength,
       currentAngle,
       lengthVelocity,
@@ -268,7 +268,7 @@ function triggerBoing(forceMagnitude: number) {
       forceMagnitude,
       restLength,
       slomoEnabled
-    })
+    }))
   }
 
   // Calculate playback rate based on force - more force = higher pitch
@@ -340,12 +340,18 @@ function handleStart(pos: { x: number; y: number }) {
     }
     isDragging = true
     mousePos = pos
+    canvas.style.cursor = 'grabbing'
   }
 }
 
 function handleMove(pos: { x: number; y: number }) {
   if (isDragging) {
     mousePos = pos
+    canvas.style.cursor = 'grabbing'
+  } else {
+    // Update cursor based on proximity to ball
+    const dist = Math.hypot(pos.x - knobPos.x, pos.y - knobPos.y)
+    canvas.style.cursor = dist < 50 ? 'grab' : 'default'
   }
 }
 
@@ -368,10 +374,10 @@ canvas.addEventListener('mousedown', (e) => {
   handleStart(getMousePos(e))
 })
 
-window.addEventListener('mousemove', (e) => {
+canvas.addEventListener('mousemove', (e) => {
+  handleMove(getMousePos(e))
   if (isDragging) {
     e.preventDefault()
-    handleMove(getMousePos(e))
   }
 })
 
@@ -526,21 +532,21 @@ function updatePhysicsStep(deltaTime: number) {
     Math.abs(angularVelocity) > 1000
 
   if (isInvalid) {
-    console.warn('Physics reset - invalid state detected', {
-      currentLength,
-      currentAngle,
-      lengthVelocity,
-      angularVelocity,
-      knobPos: { ...knobPos },
-      deltaTime,
-      timeScale,
-      reason: !Number.isFinite(currentLength) ? 'currentLength not finite' :
+    const reason = !Number.isFinite(currentLength) ? 'currentLength not finite' :
               !Number.isFinite(currentAngle) ? 'currentAngle not finite' :
               !Number.isFinite(lengthVelocity) ? 'lengthVelocity not finite' :
               !Number.isFinite(angularVelocity) ? 'angularVelocity not finite' :
               Math.abs(lengthVelocity) > 10000 ? 'lengthVelocity too high' :
               'angularVelocity too high'
-    })
+    console.warn('Physics reset: ' + reason + ' ' + JSON.stringify({
+      currentLength,
+      currentAngle,
+      lengthVelocity,
+      angularVelocity,
+      knobPos,
+      deltaTime,
+      timeScale
+    }))
     knobPos.x = basePos.x + restLength
     knobPos.y = basePos.y
     currentLength = restLength
