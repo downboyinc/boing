@@ -362,9 +362,15 @@ function updatePhysics(deltaTime: number) {
     knobPos.x = basePos.x + Math.cos(angle) * newDist
     knobPos.y = basePos.y + Math.sin(angle) * newDist
 
+    // Clamp ball so it doesn't overlap the wall (ball radius is 16)
+    const minX = basePos.x + 16
+    if (knobPos.x < minX) {
+      knobPos.x = minX
+    }
+
     // Update polar state to match current position
-    currentLength = newDist
-    currentAngle = angle
+    currentLength = Math.hypot(knobPos.x - basePos.x, knobPos.y - basePos.y)
+    currentAngle = Math.atan2(knobPos.y - basePos.y, knobPos.x - basePos.x)
     lengthVelocity = 0
     angularVelocity = 0
   } else {
@@ -382,9 +388,9 @@ function updatePhysics(deltaTime: number) {
     angularVelocity *= Math.pow(angularFriction, timeScale)
     currentAngle += angularVelocity * timeScale
 
-    // Clamp length
-    if (currentLength < 20) {
-      currentLength = 20
+    // Clamp length (minimum is ball radius)
+    if (currentLength < 16) {
+      currentLength = 16
       lengthVelocity *= -0.5
     }
 
@@ -392,9 +398,10 @@ function updatePhysics(deltaTime: number) {
     knobPos.x = basePos.x + Math.cos(currentAngle) * currentLength
     knobPos.y = basePos.y + Math.sin(currentAngle) * currentLength
 
-    // Wall bounce
-    if (knobPos.x < basePos.x + 20) {
-      knobPos.x = basePos.x + 20
+    // Wall bounce (ball radius is 16)
+    const minX = basePos.x + 16
+    if (knobPos.x < minX) {
+      knobPos.x = minX
       // Reflect angle off wall
       if (Math.abs(currentAngle) > Math.PI / 2) {
         currentAngle = Math.sign(currentAngle) * Math.PI - currentAngle
