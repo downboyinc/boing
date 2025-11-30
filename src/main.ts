@@ -10,7 +10,7 @@ const app = document.querySelector<HTMLDivElement>('#app')!
 app.innerHTML = `
   ${isMobileDevice ? `
   <div id="mobileOverlay">
-    <button id="mobileStartBtn">start boinging</button>
+    <button id="mobileStartBtn">start boinging<br><span id="muteHint">(make sure to unmute your device)</span></button>
   </div>
   ` : ''}
   <canvas id="canvas"></canvas>
