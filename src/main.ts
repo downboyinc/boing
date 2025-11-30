@@ -376,8 +376,12 @@ canvas.addEventListener('mousedown', (e) => {
 
 canvas.addEventListener('mousemove', (e) => {
   handleMove(getMousePos(e))
+})
+
+window.addEventListener('mousemove', (e) => {
   if (isDragging) {
     e.preventDefault()
+    handleMove(getMousePos(e))
   }
 })
 
