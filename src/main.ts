@@ -39,7 +39,7 @@ app.innerHTML = `
   <div class="ui-layer">
     <div id="boingCount">you've boinged 0 times</div>
     <div id="globalBoingCount">the world has boinged ? times</div>
-    <div id="footerLinks"><label><input type="checkbox" id="heatmapToggle"> boing heatmap</label> • <label><input type="checkbox" id="slomoToggle"> slomo</label> • <a href="https://github.com/gregsadetsky/boing" target="_blank">github</a></div>
+    <div id="footerLinks"><label><input type="checkbox" id="heatmapToggle"> boing heatmap</label> • <label><input type="checkbox" id="slomoToggle"> slomo</label> • <a href="https://github.com/gregsadetsky/boing" target="_blank">github</a> • <a href="https://disco.cloud/" target="_blank">hosted with Disco</a></div>
   </div>
 `
 
@@ -136,14 +136,14 @@ darkModeQuery.addEventListener('change', (e) => {
 
 // Debug mode - enable with enableDebug() in console
 let debugMode = false
-;(window as any).enableDebug = () => {
-  debugMode = true
-  console.log('Debug mode enabled - will log physics state on each boing')
-}
-;(window as any).disableDebug = () => {
-  debugMode = false
-  console.log('Debug mode disabled')
-}
+  ; (window as any).enableDebug = () => {
+    debugMode = true
+    console.log('Debug mode enabled - will log physics state on each boing')
+  }
+  ; (window as any).disableDebug = () => {
+    debugMode = false
+    console.log('Debug mode disabled')
+  }
 
 // Initialize knob position after restLength is calculated
 knobPos.x = basePos.x + restLength
@@ -537,10 +537,10 @@ function updatePhysicsStep(deltaTime: number) {
 
   if (isInvalid) {
     const reason = !Number.isFinite(currentLength) ? 'currentLength not finite' :
-              !Number.isFinite(currentAngle) ? 'currentAngle not finite' :
-              !Number.isFinite(lengthVelocity) ? 'lengthVelocity not finite' :
-              !Number.isFinite(angularVelocity) ? 'angularVelocity not finite' :
-              Math.abs(lengthVelocity) > 10000 ? 'lengthVelocity too high' :
+      !Number.isFinite(currentAngle) ? 'currentAngle not finite' :
+        !Number.isFinite(lengthVelocity) ? 'lengthVelocity not finite' :
+          !Number.isFinite(angularVelocity) ? 'angularVelocity not finite' :
+            Math.abs(lengthVelocity) > 10000 ? 'lengthVelocity too high' :
               'angularVelocity too high'
     console.warn('Physics reset: ' + reason + ' ' + JSON.stringify({
       currentLength,
