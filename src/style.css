@@ -42,15 +42,10 @@ canvas {
   touch-action: none;
 }
 
-.ui-layer {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+.canvas-ui {
   text-align: center;
-  pointer-events: none;
   color: #555;
-  white-space: nowrap;
+  padding-top: 10px;
 }
 
 #initAudio {
@@ -168,7 +163,7 @@ canvas {
     box-shadow: 10px 10px 0px rgba(0,0,0,0.3);
   }
 
-  .ui-layer {
+  .canvas-ui {
     color: #aaa;
   }
 
@@ -180,4 +175,231 @@ canvas {
   #mobileOverlay {
     background: rgba(0, 0, 0, 0.6);
   }
+
+  #newsletterLink a {
+    color: #ccc;
+    background: linear-gradient(to bottom, #3a3a3a, #2a2a2a);
+    border-color: #555;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+
+  #newsletterLink a:hover {
+    background: linear-gradient(to bottom, #444, #333);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
+
+  #creditLinks a {
+    color: #777;
+  }
+
+  #newsletterModalContent {
+    background: #2a2a2a !important;
+    border-color: #444;
+    box-shadow: 10px 10px 0px rgba(0,0,0,0.3);
+  }
+
+  #closeNewsletter {
+    color: #aaa;
+  }
+
+  #closeNewsletter:hover {
+    color: #fff;
+  }
+
+  .embeddable-buttondown-form label {
+    color: #eee !important;
+  }
+
+  .embeddable-buttondown-form input[type="email"] {
+    background: #333;
+    border-color: #555;
+    color: #fff;
+  }
+
+  .embeddable-buttondown-form input[type="email"]::placeholder {
+    color: #888;
+  }
+
+  .embeddable-buttondown-form input[type="submit"] {
+    background: #e74c3c;
+    box-shadow: 0 4px 0 #a82315;
+  }
+
+  .embeddable-buttondown-form p a {
+    color: #888;
+  }
+
+  #newsletterMessage.success {
+    color: #2ecc71;
+  }
+
+  #newsletterMessage.error {
+    color: #e74c3c;
+  }
+}
+
+#boingCount,
+#globalBoingCount {
+  font-size: 16px;
+}
+
+/* Bottom links */
+#bottomLinks {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+#newsletterLink a {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #eee;
+  background: linear-gradient(to bottom, #555, #444);
+  border: 1px solid #333;
+  border-radius: 4px;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  transition: all 0.15s;
+}
+
+#newsletterLink a:hover {
+  background: linear-gradient(to bottom, #666, #555);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+}
+
+#creditLinks {
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+#creditLinks a {
+  color: #999;
+  text-decoration: none;
+}
+
+#creditLinks a:hover {
+  text-decoration: underline;
+}
+
+/* Newsletter modal */
+#newsletterModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+#newsletterModal.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+#newsletterModalContent {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  border: 2px solid #333;
+  position: relative;
+  max-width: 90%;
+  width: 320px;
+  box-shadow: 10px 10px 0px rgba(0,0,0,0.1);
+}
+
+#closeNewsletter {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #666;
+  line-height: 1;
+  padding: 0;
+}
+
+#closeNewsletter:hover {
+  color: #000;
+}
+
+.embeddable-buttondown-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.embeddable-buttondown-form label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.embeddable-buttondown-form input[type="email"] {
+  padding: 12px;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+}
+
+.embeddable-buttondown-form input[type="email"]:focus {
+  border-color: #ff4757;
+}
+
+.embeddable-buttondown-form input[type="submit"] {
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 4px 0 #c23616;
+}
+
+.embeddable-buttondown-form input[type="submit"]:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.embeddable-buttondown-form p {
+  margin: 0;
+  font-size: 11px;
+  text-align: center;
+}
+
+.embeddable-buttondown-form p a {
+  color: #999;
+  text-decoration: none;
+}
+
+.embeddable-buttondown-form p a:hover {
+  text-decoration: underline;
+}
+
+#newsletterMessage {
+  text-align: center;
+  font-size: 16px;
+  padding: 10px;
+}
+
+#newsletterMessage.success {
+  color: #27ae60;
+}
+
+#newsletterMessage.error {
+  color: #e74c3c;
 }

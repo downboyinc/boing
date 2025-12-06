@@ -35,11 +35,27 @@ app.innerHTML = `
   ` : ''}
   <div id="canvasWrapper">
     <canvas id="canvas"></canvas>
+    <div class="canvas-ui">
+      <div id="boingCount">you've boinged 0 times</div>
+      <div id="globalBoingCount">the world has boinged ? times</div>
+      <div id="footerLinks"><label><input type="checkbox" id="heatmapToggle"> boing heatmap</label> • <label><input type="checkbox" id="slomoToggle"> slomo</label></div>
+    </div>
   </div>
-  <div class="ui-layer">
-    <div id="boingCount">you've boinged 0 times</div>
-    <div id="globalBoingCount">the world has boinged ? times</div>
-    <div id="footerLinks"><label><input type="checkbox" id="heatmapToggle"> boing heatmap</label> • <label><input type="checkbox" id="slomoToggle"> slomo</label> • <a href="https://github.com/gregsadetsky/boing" target="_blank">github</a> • <a href="https://disco.cloud/" target="_blank">hosted with Disco</a></div>
+  <div id="bottomLinks">
+    <div id="newsletterLink"><a href="#" id="openNewsletter">subscribe to my newsletter</a></div>
+    <div id="creditLinks"><a href="https://github.com/gregsadetsky/boing" target="_blank">github</a> • <a href="https://disco.cloud/" target="_blank">hosted with Disco</a></div>
+  </div>
+  <div id="newsletterModal">
+    <div id="newsletterModalContent">
+      <button id="closeNewsletter">&times;</button>
+      <form id="newsletterForm" class="embeddable-buttondown-form" action="https://buttondown.com/api/emails/embed-subscribe/gregtechnology" method="post" target="newsletterIframe">
+        <label for="bd-email">I'll send you fun things on an irregular schedule. thank you.</label>
+        <input type="email" name="email" id="bd-email" placeholder="your@email.com" required />
+        <input type="submit" value="Subscribe" />
+      </form>
+      <div id="newsletterMessage"></div>
+      <iframe name="newsletterIframe" style="display:none;"></iframe>
+    </div>
   </div>
 `
 
@@ -51,6 +67,58 @@ const mobileOverlay = document.getElementById('mobileOverlay')
 const mobileStartBtn = document.getElementById('mobileStartBtn')
 const heatmapToggle = document.getElementById('heatmapToggle') as HTMLInputElement
 const slomoToggle = document.getElementById('slomoToggle') as HTMLInputElement
+const openNewsletterBtn = document.getElementById('openNewsletter')!
+const newsletterModal = document.getElementById('newsletterModal')!
+const closeNewsletterBtn = document.getElementById('closeNewsletter')!
+
+// Newsletter modal handlers
+const emailInput = document.getElementById('bd-email') as HTMLInputElement
+const newsletterForm = document.getElementById('newsletterForm') as HTMLFormElement
+const newsletterMessage = document.getElementById('newsletterMessage')!
+
+openNewsletterBtn.addEventListener('click', (e) => {
+  e.preventDefault()
+  // Reset form state
+  newsletterForm.style.display = ''
+  newsletterForm.reset()
+  const submitBtn = newsletterForm.querySelector('input[type="submit"]') as HTMLInputElement
+  submitBtn.value = 'Subscribe'
+  submitBtn.disabled = false
+  newsletterMessage.textContent = ''
+  newsletterMessage.className = ''
+
+  newsletterModal.classList.add('visible')
+  newsletterModal.addEventListener('transitionend', () => emailInput.focus(), { once: true })
+})
+
+closeNewsletterBtn.addEventListener('click', () => {
+  newsletterModal.classList.remove('visible')
+})
+
+newsletterModal.addEventListener('click', (e) => {
+  if (e.target === newsletterModal) {
+    newsletterModal.classList.remove('visible')
+  }
+})
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && newsletterModal.classList.contains('visible')) {
+    newsletterModal.classList.remove('visible')
+  }
+})
+
+newsletterForm.addEventListener('submit', () => {
+  const submitBtn = newsletterForm.querySelector('input[type="submit"]') as HTMLInputElement
+  submitBtn.value = 'Subscribing...'
+  submitBtn.disabled = true
+
+  // Show success after a brief delay (form submits to hidden iframe)
+  setTimeout(() => {
+    newsletterForm.style.display = 'none'
+    newsletterMessage.textContent = 'Thanks for subscribing!'
+    newsletterMessage.className = 'success'
+  }, 1000)
+})
 
 // --- Physics Configuration ---
 const basePos = { x: 17, y: 200 }
@@ -173,8 +241,7 @@ function fadeOutActiveSounds() {
 
 function updateBoingCountDisplay() {
   boingCountEl.innerText = `you've boinged ${boingCount.toLocaleString()} time${boingCount === 1 ? '' : 's'}`
-  const heart = globalBoingCount !== null && globalBoingCount >= 1000000 ? ' ❤️' : ''
-  globalBoingCountEl.innerText = `the world has boinged ${globalBoingCount === null ? '?' : globalBoingCount.toLocaleString()} time${globalBoingCount === 1 ? '' : 's'}${heart}`
+  globalBoingCountEl.innerText = `the world has boinged ${globalBoingCount === null ? '?' : globalBoingCount.toLocaleString()} time${globalBoingCount === 1 ? '' : 's'} ❤️`
 }
 
 async function reportBoingToServer(angle: number, distRatio: number) {
