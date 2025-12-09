@@ -38,7 +38,7 @@ app.innerHTML = `
     <div class="canvas-ui">
       <div id="boingCount">you've boinged 0 times</div>
       <div id="globalBoingCount">the world has boinged ? times</div>
-      <div id="footerLinks"><label><input type="checkbox" id="heatmapToggle"> boing heatmap</label> • <label><input type="checkbox" id="slomoToggle"> slomo</label></div>
+      <div id="footerLinks"><label><input type="checkbox" id="heatmapToggle"> boing heatmap</label> <label><input type="checkbox" id="slomoToggle"> slomo</label></div>
     </div>
   </div>
   <div id="bottomLinks">
