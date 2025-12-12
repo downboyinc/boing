@@ -4,8 +4,11 @@
   "display_name": "boing",
   "description": "boing",
   "visibility": "public",
+  "thumbnail": {
+    "path": "rcade-thumb.png"
+  },
   "authors": {
-    "display_name": "greg i guess"
+    "display_name": "greg (i'm sure)"
   },
   "dependencies": [
     {
